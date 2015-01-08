@@ -1,0 +1,10 @@
+---
+  application: 'your site project name'
+  testlink:
+    xmlrpc_url: 'http://your.testlink.url/lib/api/xmlrpc/v1/xmlrpc.php'
+    apikey: 'testlink dev key'
+    project: 'project-name-in-testlink'
+    testplan_ci: 'continuous'
+    url_ci: 'http://ci-version.website.com'
+    testplan_production: 'production'
+    url_production: 'http://www.website.com'

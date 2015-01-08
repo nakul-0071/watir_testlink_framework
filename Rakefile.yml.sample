@@ -1,0 +1,5 @@
+require 'rubygems'
+require 'watir_testlink_framework'
+
+## set to your own default
+task default: %w[spec]
