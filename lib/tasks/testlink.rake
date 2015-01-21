@@ -10,6 +10,16 @@ namespace :testlink do
     WatirTestlinkFramework::TestLinkPlan::run_plan_cases $config['testlink']['testplans'].keys[0]
   end
 
+  desc 'run continuious intergration plan'
+  task :plan_ci do
+    WatirTestlinkFramework::TestLinkPlan::run_plan_cases $config['testlink']['testplan_ci'], 'junit'
+  end
+
+  desc 'run production testplan'
+  task :plan_production do
+    WatirTestlinkFramework::TestLinkPlan::run_plan_cases $config['testlink']['testplan_production'], 'junit'
+  end
+
   desc 'run plan by testplan name'
   task :run_plan,[:testplan] do |t, args|
     WatirTestlinkFramework::TestLinkPlan::run_plan_cases args[:testplan], 'spec'
