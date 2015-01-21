@@ -1,17 +1,33 @@
+task default: %w[testlink:run_default_plan]
 namespace :testlink do
-  desc 'run continuious intergration plan'
-  task :plan_ci do
-    WatirTestlinkFramework::TestLinkPlan::run_plan_cases $config['testlink']['testplan_ci']
-  end
+  desc 'run default testplan'
+  task :run_default_plan do
 
-  desc 'run production testplan'
-  task :plan_production do
-    WatirTestlinkFramework::TestLinkPlan::run_plan_cases $config['testlink']['testplan_production']
+    if $config['testlink']['testplans'].keys[0].nil?
+      raise "No valid testplan defined in config.yml"
+    end
+
+    WatirTestlinkFramework::TestLinkPlan::run_plan_cases $config['testlink']['testplans'].keys[0]
   end
 
   desc 'run plan by testplan name'
-  task :plan,[:testplan] do |t, args|
-    WatirTestlinkFramework::TestLinkPlan::run_plan_cases args[:testplan]
+  task :run_plan,[:testplan] do |t, args|
+    WatirTestlinkFramework::TestLinkPlan::run_plan_cases args[:testplan], 'spec'
+  end
+
+  desc 'dry run plan by testplan name, show cli cmd'
+  task :dry_run_plan,[:testplan] do |t, args|
+    WatirTestlinkFramework::TestLinkPlan::run_plan_cases args[:testplan], 'spec', true
+  end
+
+  desc 'run plan by testplan name, format junit'
+  task :run_plan_junit,[:testplan] do |t, args|
+    WatirTestlinkFramework::TestLinkPlan::run_plan_cases args[:testplan], 'junit'
+  end
+
+  desc 'dry run plan by testplan name, show cli cmd, format junit'
+  task :dry_run_plan_junit,[:testplan] do |t, args|
+    WatirTestlinkFramework::TestLinkPlan::run_plan_cases args[:testplan], 'junit', true
   end
 
   desc 'Creates a spec file with all cases from TestLink requirements export'
@@ -35,8 +51,14 @@ namespace :testlink do
     print "\nwrote output to tc-testlink.xml\n\n"
   end
 
-  desc 'Run spec(s) with junit output'
+  desc 'Run spec(s) with doc output'
   RSpec::Core::RakeTask.new(:spec) do |t|
+    t.rspec_opts = "--format documentation"
+    t.pattern = '**/*_spec.rb'
+  end
+
+  desc 'Run spec(s) with junit output'
+  RSpec::Core::RakeTask.new(:junit) do |t|
 
     d = DateTime.now
     newTarget = d.strftime("%Y%m%dT%H%M%S")

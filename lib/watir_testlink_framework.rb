@@ -16,10 +16,9 @@ $config = YAML.load_file('config.yml')
 module WatirTestlinkFramework
   class TestLinkPlan
 
-    def self.run_plan_cases(plan)
-      #TL URL to test
-      #TL BuildPrefixName
-      # report back
+    def self.run_plan_cases(plan, spectask='spec', dryrun=false)
+      #TODO TL BuildPrefixName
+      #TODO report back
       server = $config['testlink']['xmlrpc_url']
       dev_key = $config['testlink']['apikey']
       tl_project = $config['testlink']['project']
@@ -29,12 +28,22 @@ module WatirTestlinkFramework
       project_id = tl.project_id tl_project
       plan_id = tl.test_plan_by_name(tl_project, plan)
 
+      envstr=''
+      $config['testlink']['testplans'][plan].each do | varname, varvalue |
+          envstr+= "#{varname.upcase}='#{varvalue}' "
+      end
+
       test_cases = tl.test_cases_for_test_plan(plan_id[0][:id])
       test_cases.each do |tc|
         tc_customfield = tl.test_case_custom_field_design_value(project_id, tc[1][0]['full_external_id'], tc[1][0]['version'].to_i, 'RSPEC CASE ID',{:details=>''})
 
+        exec_string = "#{envstr}bundle exec rake testlink:#{spectask} SPEC_OPTS=\"-e #{tc_customfield}\""
+        if dryrun
+          puts exec_string
+        else
+          system exec_string
+        end
         #TODO exit 1 when failing
-        system("bundle exec rake testlink:spec SPEC_OPTS=\"-e #{tc_customfield}\"")
       end
     end
   end
