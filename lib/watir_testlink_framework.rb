@@ -13,29 +13,53 @@ raise "Fatal: config.yml is missing." unless File.exists?('config.yml')
 
 $config = YAML.load_file('config.yml')
 
+#TODO TL BuildPrefixName
+#TODO report back
+#TODO exit 1 when failing
 module WatirTestlinkFramework
   class TestLinkPlan
 
-    def self.run_plan_cases(plan, spectask='spec', dryrun=false)
-      #TODO TL BuildPrefixName
-      #TODO report back
+    def self.testlinkplanconnection
       server = $config['testlink']['xmlrpc_url']
       dev_key = $config['testlink']['apikey']
-      tl_project = $config['testlink']['project']
+      return TestLinker.new(server, dev_key)
+    end
 
-      tl = TestLinker.new(server, dev_key)
+    def self.casesbyplan(tl,plan)
+      plan_id = tl.test_plan_by_name($config['testlink']['project'], plan)
+      return tl.test_cases_for_test_plan(plan_id[0][:id])
+    end
 
-      project_id = tl.project_id tl_project
-      plan_id = tl.test_plan_by_name(tl_project, plan)
+    #plans_string comma seperated string with plans
+    def self.run_plan_cases(plans_string, spectask='spec', dryrun=false)
 
-      envstr=''
-      $config['testlink']['testplans'][plan].each do | varname, varvalue |
-          envstr+= "#{varname.upcase}='#{varvalue}' "
+      tl = self.testlinkplanconnection
+
+      plans = plans_string.split(';')
+
+      plans.each do | plan |
+        test_cases = self.casesbyplan(tl,plan.strip)
+        if $config['testlink'].has_key?("multi_env") && $config['testlink']['multi_env'] != 0
+          $config['testlink']['testplans'][plan.strip].each do | envname, envarr |
+            envstr = make_env_string(envarr)
+            self.execute_cases(tl, envstr,spectask,test_cases,dryrun)
+          end
+        else
+          envstr = make_env_string($config['testlink']['testplans'][plan.strip])
+          self.execute_cases(tl, envstr,spectask, test_cases,dryrun)
+        end
+
       end
 
-      test_cases = tl.test_cases_for_test_plan(plan_id[0][:id])
+    end
+
+    def self.execute_cases(tl, envstr,spectask, test_cases,dryrun)
       test_cases.each do |tc|
-        tc_customfield = tl.test_case_custom_field_design_value(project_id, tc[1][0]['full_external_id'], tc[1][0]['version'].to_i, 'RSPEC CASE ID',{:details=>''})
+
+        tc_customfield = tl.test_case_custom_field_design_value(tl.project_id($config['testlink']['project']),
+                                                                tc[1][0]['full_external_id'], 
+                                                                tc[1][0]['version'].to_i,
+                                                                'RSPEC CASE ID',{:details=>''})
 
         exec_string = "#{envstr}bundle exec rake testlink:#{spectask} SPEC_OPTS=\"-e #{tc_customfield}\""
         if dryrun
@@ -43,8 +67,37 @@ module WatirTestlinkFramework
         else
           system exec_string
         end
-        #TODO exit 1 when failing
       end
     end
+
+    def self.make_env_string(envarr)
+      envstr=''
+      envarr.each do | varname,varvalue|
+        envstr+= "#{varname.upcase}='#{varvalue}' "
+      end
+      return envstr
+    end
+
   end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

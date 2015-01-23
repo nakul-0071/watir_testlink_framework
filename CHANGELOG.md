@@ -1,5 +1,11 @@
 # CHANGLOG
 
+# v0.0.4 - 2015-01-23
+* add multi-environment functionality:one test plan multiple agains
+  multiple urls
+* add semicolon seperated plans: one call run different plans. for
+  environments serving multiple url's at once
+
 # v0.0.3 - 2015-01-21
 * restore ci and production preset tasks
 
