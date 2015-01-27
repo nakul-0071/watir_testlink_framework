@@ -7,7 +7,7 @@ namespace :testlink do
       raise "No valid testplan defined in config.yml"
     end
 
-    WatirTestlinkFramework::TestLinkPlan::run_plan_cases $config['testlink']['testplans'].keys[0]
+    WatirTestlinkFramework::TestLinkPlan::run_plan_cases $config['testlink']['testplans'].keys[0], 'spec'
   end
 
   desc 'run continuious intergration plan'

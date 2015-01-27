@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "rspec", "~> 3.1"
   spec.add_runtime_dependency "rspec_testlink_formatters", "~> 0"
   spec.add_runtime_dependency "testlink_rspec_utils", "~> 0"
+  spec.add_runtime_dependency "xml-simple", "~> 1.1.4"
 #  spec.add_runtime_dependency "watir", "~> 5.0"
 #  spec.add_runtime_dependency "headless", "~> 1.0"
 end

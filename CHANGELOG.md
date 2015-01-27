@@ -1,5 +1,8 @@
 # CHANGLOG
 
+# v0.0.5 - 2015-01-27
+* implement testlink reporting
+
 # v0.0.4 - 2015-01-23
 * add multi-environment functionality:one test plan multiple agains
   multiple urls
