@@ -1,5 +1,8 @@
 # CHANGLOG
 
+# v0.0.6 - 2015-01-28
+* build per environment
+
 # v0.0.5 - 2015-01-27
 * implement testlink reporting
 

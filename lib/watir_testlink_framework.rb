@@ -41,20 +41,21 @@ module WatirTestlinkFramework
         plan_id = self.planid_by_name(tl, plan.strip)
         test_cases = tl.test_cases_for_test_plan(plan_id)
 
-        #create new build
-        buildname = "watirbuild_#{Time.new}"
-        tl.create_build(plan_id, buildname, 'created by watir_testlink_framework')
-
         if $config['testlink'].has_key?("multi_env") && $config['testlink']['multi_env'] != 0
           $config['testlink']['testplans'][plan.strip].each do | envname, envarr |
+
+            #create new build
+            buildname = "build_#{envname}_#{Time.new}"
+            tl.create_build(plan_id, buildname, 'created by watir_testlink_framework')
 
             envstr = make_env_string(envarr)
             self.execute_cases(tl, envstr, spectask, test_cases, dryrun)
             self.report_cases(tl, plan_id, test_cases, envstr) if spectask=='junit' && !dryrun
-
           end
 
         else
+          buildname = "build_#{Time.new}"
+          tl.create_build(plan_id, buildname, 'created by watir_testlink_framework')
           envstr = make_env_string($config['testlink']['testplans'][plan.strip])
           self.execute_cases(tl, envstr, spectask, test_cases, dryrun)
           self.report_cases(tl, plan_id, test_cases, envstr) if spectask=='junit' && !dryrun
