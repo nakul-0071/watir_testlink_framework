@@ -1,5 +1,9 @@
 # CHANGLOG
 
+# v0.0.7 - 2015-01-29
+* report per testcase
+* catch report exception
+
 # v0.0.6 - 2015-01-28
 * build per environment
 
